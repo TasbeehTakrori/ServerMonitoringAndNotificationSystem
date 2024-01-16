@@ -5,6 +5,7 @@ using RabbitMQClientLibrary;
 using ServerStatisticsCollectionLibrary;
 using ServerStatisticsCollectionLibrary.Models;
 using ServerStatisticsCollectionService;
+using System.Threading.Tasks;
 
 
 var host = new HostBuilder()
@@ -31,4 +32,14 @@ using var serviceScope = host.Services.CreateScope();
 var services = serviceScope.ServiceProvider;
 var serverStatisticsCollectorService = services.GetRequiredService<IServerStatisticsCollectorService>();
 
-serverStatisticsCollectorService.Run();
+var cancellationTokenSource = new CancellationTokenSource();
+var cancellationToken = cancellationTokenSource.Token;
+
+var task = Task.Run(() => serverStatisticsCollectorService.RunAsync(cancellationToken));
+
+Console.WriteLine("Press any key to stop...");
+Console.ReadKey();
+
+cancellationTokenSource.Cancel();
+
+await task;

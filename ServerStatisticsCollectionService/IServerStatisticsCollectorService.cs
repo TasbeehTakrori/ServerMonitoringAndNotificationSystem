@@ -2,6 +2,6 @@
 {
     internal interface IServerStatisticsCollectorService
     {
-        void Run();
+        Task RunAsync(CancellationToken cancellationToken);
     }
 }

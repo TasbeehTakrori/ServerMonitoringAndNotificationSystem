@@ -19,13 +19,20 @@ namespace ServerStatisticsCollectionService
             _publisher = publisher;
             _statisticsCollector = statisticsCollector;
         }
-        public void Run()
+        public async Task RunAsync(CancellationToken cancellationToken)
         {
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 var statistics = _statisticsCollector.CollectStatistics();
                 _publisher.Publish(statistics, $"ServerStatistics.{_config.ServerIdentifier}");
-                Thread.Sleep(TimeSpan.FromSeconds(_config.SamplingIntervalSeconds));
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(_config.SamplingIntervalSeconds), cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    Console.WriteLine("Cancel!");
+                }
             }
         }
     }
