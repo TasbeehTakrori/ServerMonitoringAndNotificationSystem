@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RabbitMQClientLibrary;
 using ServerStatisticsCollectionLibrary;
+using ServerStatisticsCollectionLibrary.Models;
 using ServerStatisticsCollectionService;
-
 
 
 var host = new HostBuilder()
@@ -19,7 +20,7 @@ var host = new HostBuilder()
                 services.Configure<RabbitMQConfig>(
                     hostContext.Configuration.GetSection("MessagingSettings:RabbitMQConfig"));
 
-                services.AddSingleton<IMessageQueuePublisher, RabbitMQPublisher>();
+                services.AddSingleton<IMessageQueuePublisher<ServerStatistics>, RabbitMQPublisher<ServerStatistics>>();
                 services.AddSingleton<IServerStatisticsCollector, ServerStatisticsCollector>();
                 services.AddSingleton<IServerStatisticsCollectorService, ServerStatisticsCollectorService>();
             })

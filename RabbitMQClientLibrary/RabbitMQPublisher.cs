@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-using ServerStatisticsCollectionLibrary.Models;
 using System.Text;
 
-namespace ServerStatisticsCollectionService
+namespace RabbitMQClientLibrary
 {
-    public class RabbitMQPublisher : IMessageQueuePublisher
+    public class RabbitMQPublisher<T> : IMessageQueuePublisher<T>
     {
         private readonly RabbitMQConfig _rabbitMQConfig;
 
@@ -15,7 +14,7 @@ namespace ServerStatisticsCollectionService
             _rabbitMQConfig = rabbitMQConfig.Value;
         }
 
-        public void PublishMessage(ServerStatistics statistics, string topic)
+        public void Publish(T payload, string key)
         {
             var factory = new ConnectionFactory
             {
@@ -25,13 +24,13 @@ namespace ServerStatisticsCollectionService
                 Password = _rabbitMQConfig.Password
             };
 
-            var messageBody = JsonConvert.SerializeObject(statistics);
+            var messageBody = JsonConvert.SerializeObject(payload);
 
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
             channel.ExchangeDeclare(_rabbitMQConfig.ExchangeName, _rabbitMQConfig.ExchangeType);
-            channel.BasicPublish(_rabbitMQConfig.ExchangeName, topic, null, Encoding.UTF8.GetBytes(messageBody));
+            channel.BasicPublish(_rabbitMQConfig.ExchangeName, key, null, Encoding.UTF8.GetBytes(messageBody));
         }
     }
 }

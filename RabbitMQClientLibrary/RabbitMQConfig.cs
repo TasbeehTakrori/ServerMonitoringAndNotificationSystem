@@ -1,4 +1,4 @@
-﻿namespace ServerStatisticsCollectionService
+﻿namespace RabbitMQClientLibrary
 {
     public class RabbitMQConfig
     {
