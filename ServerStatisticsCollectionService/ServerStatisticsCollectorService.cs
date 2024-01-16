@@ -10,6 +10,7 @@ namespace ServerStatisticsCollectionService
         private readonly ServerStatisticsConfig _config;
         private readonly IMessageQueuePublisher<ServerStatistics> _publisher;
         private readonly IServerStatisticsCollector _statisticsCollector;
+        //TODO => Add Logging
         public ServerStatisticsCollectorService(
             IOptions<ServerStatisticsConfig> config,
             IMessageQueuePublisher<ServerStatistics> publisher,
@@ -24,15 +25,15 @@ namespace ServerStatisticsCollectionService
             while (!cancellationToken.IsCancellationRequested)
             {
                 var statistics = _statisticsCollector.CollectStatistics();
-                _publisher.Publish(statistics, $"ServerStatistics.{_config.ServerIdentifier}");
+                _publisher.PublishMessage(statistics, $"ServerStatistics.{_config.ServerIdentifier}");
+                Console.WriteLine("Publish...");
+
                 try
                 {
                     await Task.Delay(TimeSpan.FromSeconds(_config.SamplingIntervalSeconds), cancellationToken);
                 }
                 catch (TaskCanceledException)
-                {
-                    Console.WriteLine("Cancel!");
-                }
+                { }
             }
         }
     }

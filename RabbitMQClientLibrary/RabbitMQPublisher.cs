@@ -5,17 +5,17 @@ using System.Text;
 
 namespace RabbitMQClientLibrary
 {
-    public class RabbitMQPublisher<T> : IMessageQueuePublisher<T>
+    public class RabbitMQPublisher<T> : IMessageQueuePublisher<T>, IDisposable
     {
-        private readonly RabbitMQConfig _rabbitMQConfig;
+        private readonly IConnection _connection;
+        private readonly IModel _channel;
+        private readonly string _exchangeName;
+        private readonly string _exchangeType;
 
         public RabbitMQPublisher(IOptions<RabbitMQConfig> rabbitMQConfig)
         {
-            _rabbitMQConfig = rabbitMQConfig.Value;
-        }
+            var _rabbitMQConfig = rabbitMQConfig.Value;
 
-        public void Publish(T payload, string key)
-        {
             var factory = new ConnectionFactory
             {
                 HostName = _rabbitMQConfig.HostName,
@@ -24,13 +24,24 @@ namespace RabbitMQClientLibrary
                 Password = _rabbitMQConfig.Password
             };
 
+            _connection = factory.CreateConnection();
+            _channel = _connection.CreateModel();
+            _exchangeName = _rabbitMQConfig.ExchangeName;
+            _exchangeType = _rabbitMQConfig.ExchangeType;
+            _channel.ExchangeDeclare(_exchangeName, _exchangeType);
+        }
+
+        public void PublishMessage(T payload, string key)
+        {
             var messageBody = JsonConvert.SerializeObject(payload);
 
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
-
-            channel.ExchangeDeclare(_rabbitMQConfig.ExchangeName, _rabbitMQConfig.ExchangeType);
-            channel.BasicPublish(_rabbitMQConfig.ExchangeName, key, null, Encoding.UTF8.GetBytes(messageBody));
+            _channel.BasicPublish(_exchangeName, key, null, Encoding.UTF8.GetBytes(messageBody));
         }
+        public void Dispose()
+        {
+            _channel.Dispose();
+            _connection.Dispose();
+        }
+
     }
 }

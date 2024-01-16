@@ -5,7 +5,6 @@ using RabbitMQClientLibrary;
 using ServerStatisticsCollectionLibrary;
 using ServerStatisticsCollectionLibrary.Models;
 using ServerStatisticsCollectionService;
-using System.Threading.Tasks;
 
 
 var host = new HostBuilder()

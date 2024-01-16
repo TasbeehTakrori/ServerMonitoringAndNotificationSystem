@@ -3,6 +3,6 @@ namespace RabbitMQClientLibrary
 {
     public interface IMessageQueuePublisher<T>
     {
-        void Publish(T payload, string key);
+        void PublishMessage(T payload, string key);
     }
 }
