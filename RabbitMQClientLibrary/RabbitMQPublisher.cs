@@ -37,11 +37,11 @@ namespace RabbitMQClientLibrary
 
             _channel.BasicPublish(_exchangeName, key, null, Encoding.UTF8.GetBytes(messageBody));
         }
+
         public void Dispose()
         {
             _channel.Dispose();
             _connection.Dispose();
         }
-
     }
 }
