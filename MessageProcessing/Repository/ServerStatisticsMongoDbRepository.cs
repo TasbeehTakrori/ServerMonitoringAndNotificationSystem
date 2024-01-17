@@ -3,7 +3,7 @@ using MongoDB.Driver;
 
 namespace MessageProcessing.Repository
 {
-    public class ServerStatisticsMongoDbRepository : IRepository
+    public class ServerStatisticsMongoDbRepository : IRepository<ServerStatistics>
     {
         private readonly IMongoCollection<ServerStatistics> _collection;
 
@@ -14,9 +14,9 @@ namespace MessageProcessing.Repository
             var _database = _client.GetDatabase(mongoDbSettings.DatabaseName);
             _collection = _database.GetCollection<ServerStatistics>("ServerStatistics");
         }
-        public void Add(ServerStatistics serverStatistics)
+        public async Task SaveAsync(ServerStatistics serverStatistics)
         {
-            _collection.InsertOne(serverStatistics);
+           await _collection.InsertOneAsync(serverStatistics);
         }
     }
 }

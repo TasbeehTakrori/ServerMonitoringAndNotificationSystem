@@ -1,4 +1,5 @@
 ﻿using MessageProcessing;
+using MessageProcessing.MessageHandling;
 using MessageProcessing.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,29 +19,18 @@ var host = new HostBuilder()
                     hostContext.Configuration.GetSection("MessagingSettings:RabbitMQConfig"));
 
                 services.AddSingleton<IMessageQueueConsumer<ServerStatistics>, RabbitMQConsumer<ServerStatistics>>();
-                services.AddSingleton<IRepository, ServerStatisticsMongoDbRepository>();
+                services.AddSingleton<IRepository<ServerStatistics>, ServerStatisticsMongoDbRepository>();
+                services.AddSingleton<IMessageHandler<ServerStatistics>, MessageHandler<ServerStatistics>>();
+                services.AddSingleton<IMessageProcessor, MessageProcessor>();
             })
             .Build();
 
 using var serviceScope = host.Services.CreateScope();
 
 var services = serviceScope.ServiceProvider;
-var consumer = services.GetRequiredService<IMessageQueueConsumer<ServerStatistics>>();
+var processor = services.GetRequiredService<IMessageProcessor>();
 
-IRepository db = services.GetRequiredService<IRepository>();
-
-ServerStatistics serverStats = new ServerStatistics
-{
-    ServerIdentifier = "Server001",
-    MemoryUsage = 512.5,
-    AvailableMemory = 1024.8,
-    CpuUsage = 25.3,
-    Timestamp = DateTime.Now
-};
-
-db.Add(serverStats);
-
-consumer.StartConsumingMessages("ServerStatistics.*");
+processor.Run();
 
 Console.ReadKey();
 

@@ -1,7 +1,7 @@
 ﻿namespace MessageProcessing.Repository
 {
-    public interface IRepository
+    public interface IRepository<T>
     {
-        void Add(ServerStatistics serverStatistics);
+        Task SaveAsync(T data);
     }
 }
