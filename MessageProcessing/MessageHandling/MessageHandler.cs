@@ -1,24 +1,29 @@
-﻿using MessageProcessing.Repository;
+﻿using MessageProcessing.MessageHandling;
+using MessageProcessing.Repository;
+using SignalRServer.AlertHubHandling;
 
-namespace MessageProcessing.MessageHandling
+internal class MessageHandler<T> : IMessageHandler<T>
 {
-    internal class MessageHandler<T> : IMessageHandler<T>
+    private readonly IRepository<T> _repository;
+    private readonly IHubConnection _hubConnection;
+
+    public MessageHandler(IRepository<T> repository, IHubConnection hubConnection)
     {
-        private readonly IRepository<T> _repository;
-        public MessageHandler(IRepository<T> repository)
+        _repository = repository;
+        _hubConnection = hubConnection;
+    }
+
+    public async Task HandleMessage(T message)
+    {
+        try
         {
-            _repository = repository;
+            await _repository.SaveAsync(message);
+            await _hubConnection.SendAsync("SendHighUsageAlertMessage", "***");
+            Console.WriteLine("Message sent successfully.");
         }
-        public async Task HandleMessage(T message)
+        catch (Exception ex)
         {
-            try
-            {
-                await _repository.SaveAsync(message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            Console.WriteLine($"Error handling message: {ex}");
         }
     }
 }

@@ -5,11 +5,13 @@ VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerStatisticsCollectionService", "ServerStatisticsCollectionService\ServerStatisticsCollectionService.csproj", "{5D3B6477-0752-421D-A766-383E52FD5518}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerStatisticsCollectionLibrary", "ServerStatisticsCollectionLibrary\ServerStatisticsCollectionLibrary.csproj", "{123F6F21-700E-462F-B211-8671FC1632AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerStatisticsCollectionLibrary", "ServerStatisticsCollectionLibrary\ServerStatisticsCollectionLibrary.csproj", "{123F6F21-700E-462F-B211-8671FC1632AB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQClientLibrary", "RabbitMQClientLibrary\RabbitMQClientLibrary.csproj", "{1FCFF803-9491-4B62-95D0-A15FF274A670}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQClientLibrary", "RabbitMQClientLibrary\RabbitMQClientLibrary.csproj", "{1FCFF803-9491-4B62-95D0-A15FF274A670}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageProcessing", "MessageProcessing\MessageProcessing.csproj", "{26E8232F-6F6C-48F6-BCEA-3EE3B5524C71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageProcessing", "MessageProcessing\MessageProcessing.csproj", "{26E8232F-6F6C-48F6-BCEA-3EE3B5524C71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRServer", "SignalRServer\SignalRServer.csproj", "{F5B51301-2AC8-475D-978A-9CB71BFE51CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{26E8232F-6F6C-48F6-BCEA-3EE3B5524C71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26E8232F-6F6C-48F6-BCEA-3EE3B5524C71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26E8232F-6F6C-48F6-BCEA-3EE3B5524C71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5B51301-2AC8-475D-978A-9CB71BFE51CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5B51301-2AC8-475D-978A-9CB71BFE51CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5B51301-2AC8-475D-978A-9CB71BFE51CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5B51301-2AC8-475D-978A-9CB71BFE51CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQClientLibrary;
+using SignalRServer.AlertHubHandling;
 
 var host = new HostBuilder()
             .ConfigureAppConfiguration((hostContext, config) =>
@@ -17,7 +18,10 @@ var host = new HostBuilder()
                     hostContext.Configuration.GetSection("DatabaseSettings"));
                 services.Configure<RabbitMQConfig>(
                     hostContext.Configuration.GetSection("MessagingSettings:RabbitMQConfig"));
+                services.Configure<SignalRConfig>(
+                    hostContext.Configuration.GetSection("SignalRConfig"));
 
+                services.AddSingleton<IHubConnection, AlertHubConnectionHandler>();
                 services.AddSingleton<IMessageQueueConsumer<ServerStatistics>, RabbitMQConsumer<ServerStatistics>>();
                 services.AddSingleton<IRepository<ServerStatistics>, ServerStatisticsMongoDbRepository>();
                 services.AddSingleton<IMessageHandler<ServerStatistics>, MessageHandler<ServerStatistics>>();
@@ -33,6 +37,3 @@ var processor = services.GetRequiredService<IMessageProcessor>();
 processor.Run();
 
 Console.ReadKey();
-
-//TODO => handling service
-//TODO => MessageProcessing class

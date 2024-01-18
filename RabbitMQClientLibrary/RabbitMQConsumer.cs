@@ -53,6 +53,7 @@ namespace RabbitMQClientLibrary
                 byte[] body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var payload = JsonConvert.DeserializeObject<T>(message);
+                Console.WriteLine(message);
                 await handleMessage(payload);
             };
 
