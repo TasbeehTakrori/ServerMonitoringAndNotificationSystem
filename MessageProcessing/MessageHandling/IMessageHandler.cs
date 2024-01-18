@@ -2,6 +2,6 @@
 {
     internal interface IMessageHandler
     {
-        Task HandleMessage(ServerStatistics serverStatistics);
+        Task HandleMessage(ServerStatistics serverStatistics, string serverIdentifier);
     }
 }

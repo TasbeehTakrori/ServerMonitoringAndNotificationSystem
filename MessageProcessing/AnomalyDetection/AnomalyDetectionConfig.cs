@@ -7,5 +7,4 @@
         public double MemoryUsageThresholdPercentage { get; set; }
         public double CpuUsageThresholdPercentage { get; set; }
     }
-
 }

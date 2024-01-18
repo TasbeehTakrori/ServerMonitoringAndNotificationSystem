@@ -21,6 +21,8 @@ var host = new HostBuilder()
                     hostContext.Configuration.GetSection("MessagingSettings:RabbitMQConfig"));
                 services.Configure<SignalRConfig>(
                     hostContext.Configuration.GetSection("SignalRConfig"));
+                services.Configure<AnomalyDetectionConfig>(
+                 hostContext.Configuration.GetSection("AnomalyDetectionConfig"));
 
                 services.AddSingleton<IHubConnection, AlertHubConnectionHandler>();
                 services.AddSingleton<IAnomalyDetector, AnomalyDetector>();

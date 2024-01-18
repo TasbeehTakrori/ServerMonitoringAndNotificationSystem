@@ -38,7 +38,7 @@ namespace RabbitMQClientLibrary
             _queueName = _channel.QueueDeclare().QueueName;
         }
 
-        public void StartConsumingMessages(string key, Func<T, Task> handleMessage)
+        public void StartConsumingMessages(string key, Func<T, string, Task> handleMessage)
         {
 
             _channel.QueueBind(
@@ -54,7 +54,7 @@ namespace RabbitMQClientLibrary
                 var message = Encoding.UTF8.GetString(body);
                 var payload = JsonConvert.DeserializeObject<T>(message);
                 Console.WriteLine(message);
-                await handleMessage(payload);
+                await handleMessage(payload, ea.RoutingKey);
             };
 
             _channel.BasicConsume(

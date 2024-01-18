@@ -11,7 +11,6 @@ namespace ServerStatisticsCollectionLibrary
 
         public ServerStatistics CollectStatistics()
         {
-            Thread.Sleep(1000);
             var memoryUsage = GetMemoryUsage();
             var availableMemory = GetAvailableMemory();
             var cpuUsage = GetCpuUsage();
@@ -40,6 +39,8 @@ namespace ServerStatisticsCollectionLibrary
 
         private double GetCpuUsage()
         {
+            _ = _cpuCounter.NextValue();
+            Thread.Sleep(100);
             return _cpuCounter.NextValue() / 100;
         }
     }

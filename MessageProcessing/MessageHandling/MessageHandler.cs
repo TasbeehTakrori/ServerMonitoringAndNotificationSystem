@@ -2,35 +2,46 @@
 using MessageProcessing.AnomalyDetection;
 using MessageProcessing.MessageHandling;
 using MessageProcessing.Repository;
-using SignalRServer.AlertHubHandling;
+using Microsoft.Extensions.Logging;
 
 internal class MessageHandler : IMessageHandler
 {
     private readonly IRepository _repository;
     private readonly IAnomalyDetector _anomalyDetector;
+    private readonly ILogger<MessageHandler> _logger;
 
     public MessageHandler(
         IRepository repository,
-        IAnomalyDetector anomalyDetector)
+        IAnomalyDetector anomalyDetector,
+        ILogger<MessageHandler> logger)
     {
         _repository = repository;
         _anomalyDetector = anomalyDetector;
+        _logger = logger;
     }
 
-    public async Task HandleMessage(ServerStatistics serverStatistics)
+    public async Task HandleMessage(ServerStatistics serverStatistics, string routingKey)
     {
         try
         {
-            var previousStatistic = await _repository.GetLastRecordForServer(serverStatistics.ServerIdentifier);
+            string serverIdentifier = GetServerIdentifier(routingKey);
+            serverStatistics.ServerIdentifier = serverIdentifier;
+            var previousStatistic = await _repository.GetLastRecordForServer(serverIdentifier);
             await _repository.SaveAsync(serverStatistics);
             await _anomalyDetector.DetectAnomalies(
                 currentStatistics: serverStatistics,
                 previousStatistics: previousStatistic);
-            Console.WriteLine("Message sent successfully.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error handling message: {ex}");
+            _logger.LogError($"Error handling message: {ex.Message}");
         }
+    }
+
+    private string GetServerIdentifier(string routingKey)
+    {
+        string[] parts = routingKey.Split('.');
+        string serverIdentifier = parts.Length > 1 ? parts[1] : string.Empty;
+        return serverIdentifier;
     }
 }
