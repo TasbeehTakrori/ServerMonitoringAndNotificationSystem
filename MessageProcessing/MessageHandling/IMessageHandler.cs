@@ -1,7 +1,7 @@
 ﻿namespace MessageProcessing.MessageHandling
 {
-    internal interface IMessageHandler<T>
+    internal interface IMessageHandler
     {
-        Task HandleMessage(T message);
+        Task HandleMessage(ServerStatistics serverStatistics);
     }
 }

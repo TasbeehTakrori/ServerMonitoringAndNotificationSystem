@@ -7,11 +7,11 @@ namespace MessageProcessing
     internal class MessageProcessor : IMessageProcessor
     {
         private readonly IMessageQueueConsumer<ServerStatistics> _consumer;
-        private readonly IMessageHandler<ServerStatistics> _messageHandler;
+        private readonly IMessageHandler _messageHandler;
 
         public MessageProcessor(
             IMessageQueueConsumer<ServerStatistics> consumer,
-            IMessageHandler<ServerStatistics> messageHandler)
+            IMessageHandler messageHandler)
         {
             _consumer = consumer;
             _messageHandler = messageHandler;
@@ -20,7 +20,6 @@ namespace MessageProcessing
         public void Run()
         {
             _consumer.StartConsumingMessages("ServerStatistics.*", _messageHandler.HandleMessage);
-
         }
     }
 }

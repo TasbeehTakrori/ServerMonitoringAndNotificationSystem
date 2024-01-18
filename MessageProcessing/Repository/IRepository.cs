@@ -1,7 +1,8 @@
 ﻿namespace MessageProcessing.Repository
 {
-    public interface IRepository<T>
+    public interface IRepository
     {
-        Task SaveAsync(T data);
+        Task SaveAsync(ServerStatistics data);
+        Task<ServerStatistics> GetLastRecordForServer(string serverIdentifier);
     }
 }

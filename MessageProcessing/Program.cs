@@ -1,4 +1,5 @@
 ﻿using MessageProcessing;
+using MessageProcessing.AnomalyDetection;
 using MessageProcessing.MessageHandling;
 using MessageProcessing.Repository;
 using Microsoft.Extensions.Configuration;
@@ -22,9 +23,10 @@ var host = new HostBuilder()
                     hostContext.Configuration.GetSection("SignalRConfig"));
 
                 services.AddSingleton<IHubConnection, AlertHubConnectionHandler>();
+                services.AddSingleton<IAnomalyDetector, AnomalyDetector>();
                 services.AddSingleton<IMessageQueueConsumer<ServerStatistics>, RabbitMQConsumer<ServerStatistics>>();
-                services.AddSingleton<IRepository<ServerStatistics>, ServerStatisticsMongoDbRepository>();
-                services.AddSingleton<IMessageHandler<ServerStatistics>, MessageHandler<ServerStatistics>>();
+                services.AddSingleton<IRepository, ServerStatisticsMongoDbRepository>();
+                services.AddSingleton<IMessageHandler, MessageHandler>();
                 services.AddSingleton<IMessageProcessor, MessageProcessor>();
             })
             .Build();

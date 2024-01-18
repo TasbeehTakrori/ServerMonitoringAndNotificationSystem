@@ -1,24 +1,31 @@
-﻿using MessageProcessing.MessageHandling;
+﻿using MessageProcessing;
+using MessageProcessing.AnomalyDetection;
+using MessageProcessing.MessageHandling;
 using MessageProcessing.Repository;
 using SignalRServer.AlertHubHandling;
 
-internal class MessageHandler<T> : IMessageHandler<T>
+internal class MessageHandler : IMessageHandler
 {
-    private readonly IRepository<T> _repository;
-    private readonly IHubConnection _hubConnection;
+    private readonly IRepository _repository;
+    private readonly IAnomalyDetector _anomalyDetector;
 
-    public MessageHandler(IRepository<T> repository, IHubConnection hubConnection)
+    public MessageHandler(
+        IRepository repository,
+        IAnomalyDetector anomalyDetector)
     {
         _repository = repository;
-        _hubConnection = hubConnection;
+        _anomalyDetector = anomalyDetector;
     }
 
-    public async Task HandleMessage(T message)
+    public async Task HandleMessage(ServerStatistics serverStatistics)
     {
         try
         {
-            await _repository.SaveAsync(message);
-            await _hubConnection.SendAsync("SendHighUsageAlertMessage", "***");
+            var previousStatistic = await _repository.GetLastRecordForServer(serverStatistics.ServerIdentifier);
+            await _repository.SaveAsync(serverStatistics);
+            await _anomalyDetector.DetectAnomalies(
+                currentStatistics: serverStatistics,
+                previousStatistics: previousStatistic);
             Console.WriteLine("Message sent successfully.");
         }
         catch (Exception ex)
