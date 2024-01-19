@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQClientLibrary", "Ra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageProcessing", "MessageProcessing\MessageProcessing.csproj", "{26E8232F-6F6C-48F6-BCEA-3EE3B5524C71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRServer", "SignalRServer\SignalRServer.csproj", "{F5B51301-2AC8-475D-978A-9CB71BFE51CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SignalRServer", "SignalRServer\SignalRServer.csproj", "{F5B51301-2AC8-475D-978A-9CB71BFE51CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalREventConsuming", "SignalREventConsumer\SignalREventConsuming.csproj", "{A3346CA5-7750-47FA-BB41-97103600CB8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{F5B51301-2AC8-475D-978A-9CB71BFE51CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5B51301-2AC8-475D-978A-9CB71BFE51CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5B51301-2AC8-475D-978A-9CB71BFE51CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3346CA5-7750-47FA-BB41-97103600CB8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3346CA5-7750-47FA-BB41-97103600CB8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3346CA5-7750-47FA-BB41-97103600CB8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3346CA5-7750-47FA-BB41-97103600CB8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -42,7 +42,7 @@ namespace SignalRServer
 
             try
             {
-                await Clients.All.ReceiveAnomalyAlert(message);
+                await Clients.All.ReceiveHighUsageAlert(message);
             }
             catch (Exception ex)
             {

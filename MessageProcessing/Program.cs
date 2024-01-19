@@ -36,6 +36,8 @@ var host = new HostBuilder()
 using var serviceScope = host.Services.CreateScope();
 
 var services = serviceScope.ServiceProvider;
+
+
 var processor = services.GetRequiredService<IMessageProcessor>();
 
 processor.Run();

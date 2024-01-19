@@ -6,41 +6,95 @@ namespace SignalRServer.AlertHubHandling
     public class AlertHubConnectionHandler : IHubConnection
     {
         private readonly HubConnection _hubConnection;
+        private readonly ILogger<AlertHubConnectionHandler> _logger;
+        private readonly Random _random = new Random();
 
-        public AlertHubConnectionHandler(IOptions<SignalRConfig> signalRConfig)
+        public AlertHubConnectionHandler(
+            IOptions<SignalRConfig> signalRConfig,
+            ILogger<AlertHubConnectionHandler> logger)
         {
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(signalRConfig.Value.SignalRUrl)
                 .Build();
             ConfigureHubConnection();
+            _logger = logger;
         }
 
-        private void ConfigureHubConnection()
+        private async Task ConfigureHubConnection()
         {
             _hubConnection.Closed += async (error) =>
             {
-                Console.WriteLine($"Connection closed with error: {error}");
-                await Task.Delay(new Random().Next(0, 5) * 1000);
-                await _hubConnection.StartAsync();
+                _logger.LogError($"Connection closed with error: {error}");
+                _logger.LogInformation("Attempting to reconnect...");
+                await Task.Delay(_random.Next(0, 5) * 1000);
+                await StartAsync();
             };
 
             _hubConnection.Reconnecting += (error) =>
             {
-                Console.WriteLine($"Reconnecting due to error: {error}");
+                _logger.LogWarning($"Reconnecting due to error: {error}");
                 return Task.CompletedTask;
             };
 
             _hubConnection.Reconnected += (connectionId) =>
             {
-                Console.WriteLine($"Reconnected with connection id: {connectionId}");
+                _logger.LogInformation($"Reconnected with connection id: {connectionId}");
                 return Task.CompletedTask;
             };
 
-            _hubConnection.StartAsync();
+            await StartAsync();
         }
 
-        public Task StartAsync() => _hubConnection.StartAsync();
-        public Task StopAsync() => _hubConnection.StopAsync();
-        public async Task SendAsync(string methodName, string message) => await _hubConnection.SendAsync(methodName, message);
+        public async Task StartAsync()
+        {
+            try
+            {
+                await _hubConnection.StartAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error starting connection: {ex.Message}");
+            }
+        }
+
+        public async Task StopAsync()
+        {
+            try
+            {
+                await _hubConnection.StopAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error stopping connection: {ex.Message}");
+            }
+        }
+
+        public async Task SendAsync(string methodName, string message)
+        {
+            if (_hubConnection.State == HubConnectionState.Connected)
+            {
+                await _hubConnection.SendAsync(methodName, message);
+            }
+            else
+            {
+                _logger.LogWarning("Cannot send message, connection is not in a connected state.");
+            }
+        }
+
+        public void SubscribeHighUsageAlert(Action<string> callback)
+        {
+            _hubConnection.On<string>("ReceiveHighUsageAlert", message =>
+            {
+                callback.Invoke(message);
+            });
+        }
+
+        public void SubscribeAnomalyAlert(Action<string> callback)
+        {
+            _hubConnection.On<string>("ReceiveAnomalyAlert", message =>
+            {
+                callback.Invoke(message);
+            });
+        }
     }
 }
