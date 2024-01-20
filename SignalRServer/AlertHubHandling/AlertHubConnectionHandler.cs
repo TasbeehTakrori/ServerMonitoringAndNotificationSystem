@@ -16,11 +16,12 @@ namespace SignalRServer.AlertHubHandling
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(signalRConfig.Value.SignalRUrl)
                 .Build();
-            ConfigureHubConnection();
             _logger = logger;
+            ConfigureHubConnection();
+            Task.Run(async () => await _hubConnection.StartAsync()).Wait();
         }
 
-        private async Task ConfigureHubConnection()
+        private void ConfigureHubConnection()
         {
             _hubConnection.Closed += async (error) =>
             {
@@ -41,8 +42,6 @@ namespace SignalRServer.AlertHubHandling
                 _logger.LogInformation($"Reconnected with connection id: {connectionId}");
                 return Task.CompletedTask;
             };
-
-            await StartAsync();
         }
 
         public async Task StartAsync()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using RabbitMQClientLibrary;
 using ServerStatisticsCollectionLibrary;
 using ServerStatisticsCollectionLibrary.Models;
@@ -14,6 +15,12 @@ var host = new HostBuilder()
             })
             .ConfigureServices((hostContext, services) =>
             {
+                services.AddLogging(builder =>
+                {
+                    builder.AddConfiguration(hostContext.Configuration.GetSection("Logging"))
+                           .AddConsole();
+                });
+
                 services.Configure<ServerStatisticsConfig>(
                     hostContext.Configuration.GetSection("ServerStatisticsConfig"));
 

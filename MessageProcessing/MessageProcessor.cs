@@ -1,5 +1,4 @@
 ﻿using MessageProcessing.MessageHandling;
-using MessageProcessing.Repository;
 using RabbitMQClientLibrary;
 
 namespace MessageProcessing

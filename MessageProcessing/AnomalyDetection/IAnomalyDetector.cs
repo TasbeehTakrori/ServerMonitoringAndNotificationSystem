@@ -1,7 +1,9 @@
-﻿namespace MessageProcessing.AnomalyDetection
+﻿using MessageProcessing.AnomalyDetection.Enum;
+
+namespace MessageProcessing.AnomalyDetection
 {
     internal interface IAnomalyDetector
     {
-        Task DetectAnomalies(ServerStatistics currentStatistics, ServerStatistics previousStatistics);
+        List<AnomalyType> DetectAnomalies(ServerStatistics currentStatistics, ServerStatistics previousStatistics);
     }
 }

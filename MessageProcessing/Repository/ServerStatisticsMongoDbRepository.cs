@@ -25,7 +25,6 @@ namespace MessageProcessing.Repository
             try
             {
                 await _collection.InsertOneAsync(serverStatistics);
-                _logger.LogInformation($"Saved server statistics for {serverStatistics.ServerIdentifier}.");
             }
             catch (Exception ex)
             {
@@ -49,7 +48,6 @@ namespace MessageProcessing.Repository
                     .Project<ServerStatistics>(projectionDefinition)
                     .FirstOrDefaultAsync();
 
-                _logger.LogInformation($"Retrieved last record for {serverIdentifier}.");
                 return lastRecord;
             }
             catch (Exception ex)

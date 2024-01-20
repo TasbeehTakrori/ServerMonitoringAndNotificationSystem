@@ -5,6 +5,7 @@ using MessageProcessing.Repository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using RabbitMQClientLibrary;
 using SignalRServer.AlertHubHandling;
 
@@ -24,8 +25,15 @@ var host = new HostBuilder()
                 services.Configure<AnomalyDetectionConfig>(
                  hostContext.Configuration.GetSection("AnomalyDetectionConfig"));
 
+                services.AddLogging(builder =>
+                {
+                    builder.AddConfiguration(hostContext.Configuration.GetSection("Logging"))
+                           .AddConsole();
+                });
+
                 services.AddSingleton<IHubConnection, AlertHubConnectionHandler>();
                 services.AddSingleton<IAnomalyDetector, AnomalyDetector>();
+                services.AddSingleton<IAnomalyHandler, AnomalyHandler>();
                 services.AddSingleton<IMessageQueueConsumer<ServerStatistics>, RabbitMQConsumer<ServerStatistics>>();
                 services.AddSingleton<IRepository, ServerStatisticsMongoDbRepository>();
                 services.AddSingleton<IMessageHandler, MessageHandler>();

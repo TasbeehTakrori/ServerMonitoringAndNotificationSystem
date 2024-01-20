@@ -15,7 +15,7 @@ namespace SignalREventConsuming
             _logger = logger;
         }
 
-        public void Run()
+        public async Task StartAsync()
         {
             try
             {

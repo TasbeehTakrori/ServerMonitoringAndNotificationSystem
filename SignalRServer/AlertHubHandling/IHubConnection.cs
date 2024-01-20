@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-
-namespace SignalRServer.AlertHubHandling
+﻿namespace SignalRServer.AlertHubHandling
 {
     public interface IHubConnection
     {

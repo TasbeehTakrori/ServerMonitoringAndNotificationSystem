@@ -13,13 +13,13 @@ namespace SignalRServer
 
         public override Task OnConnectedAsync()
         {
-            Console.WriteLine($"Client connected: {Context.ConnectionId}");
+            _logger.LogInformation($"Client connected: {Context.ConnectionId}");
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            Console.WriteLine($"Client disconnected: {Context.ConnectionId}");
+            _logger.LogInformation($"Client disconnected: {Context.ConnectionId}");
             return base.OnDisconnectedAsync(exception);
         }
         public async Task SendAnomalyAlertMessage(string message)

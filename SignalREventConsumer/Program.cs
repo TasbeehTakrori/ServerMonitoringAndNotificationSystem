@@ -32,6 +32,6 @@ using var serviceScope = host.Services.CreateScope();
 var services = serviceScope.ServiceProvider;
 
 var signalREventConsumer = services.GetRequiredService<ISignalREventConsumer>();
- signalREventConsumer.Run();
+await signalREventConsumer.StartAsync();
 
 Console.ReadKey();

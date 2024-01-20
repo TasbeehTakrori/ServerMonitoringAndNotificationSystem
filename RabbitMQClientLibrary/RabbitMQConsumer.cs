@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -13,10 +14,14 @@ namespace RabbitMQClientLibrary
         private readonly string _exchangeName;
         private readonly string _exchangeType;
         private readonly string _queueName;
+        private readonly ILogger<RabbitMQConsumer<T>> _logger;
 
-        public RabbitMQConsumer(IOptions<RabbitMQConfig> rabbitMQConfig)
+        public RabbitMQConsumer(
+            IOptions<RabbitMQConfig> rabbitMQConfig,
+            ILogger<RabbitMQConsumer<T>> logger)
         {
             var _rabbitMQConfig = rabbitMQConfig.Value;
+            _logger = logger;
 
             var factory = new ConnectionFactory
             {
@@ -50,17 +55,26 @@ namespace RabbitMQClientLibrary
 
             consumerAsync.Received += async (model, ea) =>
             {
-                byte[] body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                var payload = JsonConvert.DeserializeObject<T>(message);
-                Console.WriteLine(message);
-                await handleMessage(payload, ea.RoutingKey);
+                try
+                {
+                    byte[] body = ea.Body.ToArray();
+                    var message = Encoding.UTF8.GetString(body);
+                    var payload = JsonConvert.DeserializeObject<T>(message);
+
+                    await handleMessage(payload, ea.RoutingKey);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Error handling RabbitMQ message: {ex.Message}", ex);
+                }
             };
 
             _channel.BasicConsume(
                 queue: _queueName,
                      autoAck: true,
                      consumer: consumerAsync);
+
+            _logger.LogInformation($"RabbitMQConsumer started consuming messages. Exchange: {_exchangeName}, Queue: {_queueName}, Time: {DateTime.UtcNow}");
         }
 
         public void Dispose()

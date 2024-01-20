@@ -1,56 +1,49 @@
 ﻿using MessageProcessing;
 using MessageProcessing.AnomalyDetection;
+using MessageProcessing.AnomalyDetection.Enum;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SignalRServer.AlertHubHandling;
 
-internal class AnomalyDetector : IAnomalyDetector
+public class AnomalyDetector : IAnomalyDetector
 {
     private readonly AnomalyDetectionConfig _anomalyDetectionConfig;
-    private readonly IHubConnection _hubConnection;
-    private readonly ILogger<AnomalyDetector> _logger;
 
     public AnomalyDetector(
-        IOptions<AnomalyDetectionConfig> anomalyDetectionConfig,
-        IHubConnection hubConnection,
-        ILogger<AnomalyDetector> logger)
+        IOptions<AnomalyDetectionConfig> anomalyDetectionConfig)
     {
         _anomalyDetectionConfig = anomalyDetectionConfig.Value;
-        _hubConnection = hubConnection;
-        _logger = logger;
     }
 
-    public async Task DetectAnomalies(ServerStatistics currentStatistics, ServerStatistics previousStatistics)
+    public List<AnomalyType> DetectAnomalies(ServerStatistics currentStatistics, ServerStatistics previousStatistics)
     {
+        List<AnomalyType> anomalies = new();
+
         if (IsMemoryUsageAnomaly(currentStatistics.MemoryUsage, previousStatistics.MemoryUsage))
         {
-            await SendAnomalyAlert("Memory Usage", currentStatistics);
+            anomalies.Add(AnomalyType.MemoryUsageAnomaly);
         }
 
         if (IsCpuUsageAnomaly(currentStatistics.CpuUsage, previousStatistics.CpuUsage))
         {
-            await SendAnomalyAlert("CPU Usage", currentStatistics);
+            anomalies.Add(AnomalyType.CPUUsageAnomaly);
         }
 
         if (IsHighMemoryUsage(currentStatistics))
         {
-            await SendHighUsageAlert("Memory", currentStatistics);
+            anomalies.Add(AnomalyType.HighMemoryUsage);
         }
 
         if (IsHighCpuUsage(currentStatistics.CpuUsage))
         {
-            await SendHighUsageAlert("CPU", currentStatistics);
+            anomalies.Add(AnomalyType.HighCPUUsage);
         }
+        return anomalies;
     }
 
     public bool IsMemoryUsageAnomaly(double currentMemoryUsage, double previousMemoryUsage)
     {
         double thresholdPercentage = _anomalyDetectionConfig.MemoryUsageAnomalyThresholdPercentage;
         var isAnomaly = currentMemoryUsage > (previousMemoryUsage * (1 + thresholdPercentage));
-        if (isAnomaly)
-        {
-            _logger.LogInformation("Memory Usage Anomaly detected.");
-        }
         return isAnomaly;
     }
 
@@ -58,10 +51,6 @@ internal class AnomalyDetector : IAnomalyDetector
     {
         double thresholdPercentage = _anomalyDetectionConfig.CpuUsageAnomalyThresholdPercentage;
         var isAnomaly = currentCpuUsage > (previousCpuUsage * (1 + thresholdPercentage));
-        if (isAnomaly)
-        {
-            _logger.LogInformation("CPU Usage Anomaly detected.");
-        }
         return isAnomaly;
     }
 
@@ -69,10 +58,6 @@ internal class AnomalyDetector : IAnomalyDetector
     {
         double thresholdPercentage = _anomalyDetectionConfig.MemoryUsageThresholdPercentage;
         var isHighUsage = (currentStats.MemoryUsage / (currentStats.MemoryUsage + currentStats.AvailableMemory)) > thresholdPercentage;
-        if (isHighUsage)
-        {
-            _logger.LogInformation("High Memory Usage detected.");
-        }
         return isHighUsage;
     }
 
@@ -80,23 +65,6 @@ internal class AnomalyDetector : IAnomalyDetector
     {
         double thresholdPercentage = _anomalyDetectionConfig.CpuUsageThresholdPercentage;
         var isHighUsage = currentCpuUsage > thresholdPercentage;
-
-        if (isHighUsage)
-        {
-            _logger.LogInformation("High CPU Usage detected.");
-        }
         return isHighUsage;
-    }
-
-    private async Task SendAnomalyAlert(string alertType, ServerStatistics currentStats)
-    {
-        await _hubConnection.SendAsync("SendAnomalyAlertMessage", $"{alertType} Anomaly Detected! Server: {currentStats.ServerIdentifier}, Timestamp: {currentStats.Timestamp}");
-        _logger.LogInformation($"Anomaly Alert sent for {alertType}.");
-    }
-
-    private async Task SendHighUsageAlert(string usageType, ServerStatistics currentStats)
-    {
-        await _hubConnection.SendAsync("SendHighUsageAlertMessage", $"High {usageType} Usage Detected! Server: {currentStats.ServerIdentifier}, Timestamp: {currentStats.Timestamp}");
-        _logger.LogInformation($"High Usage Alert sent for {usageType}.");
     }
 }

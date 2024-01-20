@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System.Text;
@@ -11,10 +12,14 @@ namespace RabbitMQClientLibrary
         private readonly IModel _channel;
         private readonly string _exchangeName;
         private readonly string _exchangeType;
+        private readonly ILogger<RabbitMQPublisher<T>> _logger;
 
-        public RabbitMQPublisher(IOptions<RabbitMQConfig> rabbitMQConfig)
+        public RabbitMQPublisher(
+            IOptions<RabbitMQConfig> rabbitMQConfig,
+             ILogger<RabbitMQPublisher<T>> logger)
         {
             var _rabbitMQConfig = rabbitMQConfig.Value;
+            _logger = logger;
 
             var factory = new ConnectionFactory
             {
@@ -33,9 +38,17 @@ namespace RabbitMQClientLibrary
 
         public void PublishMessage(T payload, string key)
         {
-            var messageBody = JsonConvert.SerializeObject(payload);
+            try
+            {
+                var messageBody = JsonConvert.SerializeObject(payload);
 
-            _channel.BasicPublish(_exchangeName, key, null, Encoding.UTF8.GetBytes(messageBody));
+                _channel.BasicPublish(_exchangeName, key, null, Encoding.UTF8.GetBytes(messageBody));
+                _logger.LogInformation($"New message published successfully, Message: {messageBody}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error publishing message: {ex.Message}");
+            }
         }
 
         public void Dispose()

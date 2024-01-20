@@ -2,6 +2,6 @@
 {
     internal interface ISignalREventConsumer
     {
-        void Run();
+        Task StartAsync();
     }
 }
