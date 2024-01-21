@@ -1,4 +1,4 @@
-![image](https://github.com/TasbehTakrore/ServerMonitoringAndNotificationSystem/assets/71009816/b6755b15-f20f-4775-bddc-43a3f17b2575)# Building a Server Monitoring and Notification System
+# Building a Server Monitoring and Notification System
 
 This project involves the development of a server monitoring and notification system with multiple components, including a server statistics collection service, message processing and anomaly detection service, and a SignalR event consumer service.
 
