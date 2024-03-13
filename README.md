@@ -1,4 +1,4 @@
-# Building a Server Monitoring and Notification System
+# Server Monitoring and Notification System
 
 This project involves the development of a server monitoring and notification system with multiple components, including a server statistics collection service, message processing and anomaly detection service, and a SignalR event consumer service.
 
